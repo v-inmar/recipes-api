@@ -47,6 +47,22 @@ func ListRecipesHandler(c *gin.Context){
 	c.JSON(200, recipes)
 }
 
+// Read recipe by id handler
+// This is Bonus
+func ReadRecipeHandler(c *gin.Context){
+	id := c.Param("id")
+	for i := 0; i < len(recipes); i++{
+		if recipes[i].ID == id{
+			c.JSON(http.StatusOK, recipes[i])
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{
+		"error":"Recipe not found",
+	})
+}
+
 // Update a recipe by id handler
 func UpdateRecipeHandler(c *gin.Context){
 	id := c.Param("id")
@@ -78,6 +94,7 @@ func UpdateRecipeHandler(c *gin.Context){
 	c.JSON(http.StatusOK, recipe)
 }
 
+// Delete a recipe by id handler
 func DeleteRecipeHandler(c *gin.Context){
 	id := c.Param("id")
 	for i := 0; i < len(recipes); i++{
@@ -104,6 +121,7 @@ func main(){
 
 	r.POST("/recipes", NewRecipeHandler)
 	r.GET("/recipes", ListRecipesHandler)
+	r.GET("/recipes/:id", ReadRecipeHandler)
 	r.PUT("/recipes/:id", UpdateRecipeHandler)
 	r.DELETE("/recipes/:id", DeleteRecipeHandler)
 	r.Run()
