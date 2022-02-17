@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -111,6 +112,23 @@ func DeleteRecipeHandler(c *gin.Context){
 	})
 }
 
+// Search a recipe by tags or keywords
+func SearchRecipesHandler(c *gin.Context){
+	tag := c.Query("tag")
+	resultedRecipes := make([]Recipe, 0)
+
+	for i := 0; i<len(recipes); i++{
+		for _, t := range recipes[i].Tags {
+			if strings.EqualFold(t, tag){
+				resultedRecipes = append(resultedRecipes, recipes[i])
+				break
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, resultedRecipes)
+}
+
 func main(){
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
@@ -124,5 +142,6 @@ func main(){
 	r.GET("/recipes/:id", ReadRecipeHandler)
 	r.PUT("/recipes/:id", UpdateRecipeHandler)
 	r.DELETE("/recipes/:id", DeleteRecipeHandler)
+	r.GET("/recipes/search", SearchRecipesHandler)
 	r.Run()
 }
