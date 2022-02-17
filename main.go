@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -77,6 +78,22 @@ func UpdateRecipeHandler(c *gin.Context){
 	c.JSON(http.StatusOK, recipe)
 }
 
+func DeleteRecipeHandler(c *gin.Context){
+	id := c.Param("id")
+	for i := 0; i < len(recipes); i++{
+		if recipes[i].ID == id{
+			recipes = append(recipes[:i], recipes[i+1:]...)
+			c.JSON(http.StatusOK, gin.H{
+				"message":fmt.Sprintf("Recipe with id %s has been removed", id),
+			})
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{
+		"error": "Recipe not found",
+	})
+}
+
 func main(){
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
@@ -88,6 +105,6 @@ func main(){
 	r.POST("/recipes", NewRecipeHandler)
 	r.GET("/recipes", ListRecipesHandler)
 	r.PUT("/recipes/:id", UpdateRecipeHandler)
-
+	r.DELETE("/recipes/:id", DeleteRecipeHandler)
 	r.Run()
 }
